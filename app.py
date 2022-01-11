@@ -11,6 +11,8 @@ CUSTOM_UA = 'link recommendation orphans app -- mgerlach@wikimedia.org'
 ## load embedding
 print("Try: http://127.0.0.1:5000/api/v1/linkrec?wiki_db=simplewiki&item_id=Q1001474")
 
+## download simple model via:
+## wget https://analytics.wikimedia.org/published/datasets/one-off/mgerlach/linkrec/data/recs-link-translation_simplewiki.db
 
 @app.route('/')
 def index():
