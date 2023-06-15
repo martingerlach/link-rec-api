@@ -23,7 +23,10 @@ def get_recommendations():
 
     wiki_db = request.args.get('wiki_db')
     page_title = request.args.get('title')
-    langs_translate = None
+    langs_translate = request.args.get('langs')
+    if langs_translate!=None and isinstance(langs_translate,str):
+        langs_translate = langs_translate.split("|")
+
     list_links = utils.link_translate_inlink(page_title, wiki_db, langs_translate=langs_translate)
     df = pd.DataFrame(list_links)
     df_formatted = df.groupby(by="source", as_index=False).agg(list)
