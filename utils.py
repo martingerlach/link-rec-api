@@ -103,6 +103,8 @@ def link_translate_inlink(page_title, wiki_db, langs_translate=None):
 
     # find the same article in other languages
     page_title_langs = get_page_langs(page_title, wiki_db)
+    # find existing inlinks
+    page_title_inlinks = get_page_inlinks(page_title, wiki_db)
     # find inlinks in each language and check if they exist in wiki_db
     for r in page_title_langs:
         p = r["page_title"]
@@ -115,6 +117,9 @@ def link_translate_inlink(page_title, wiki_db, langs_translate=None):
         r_inlinks = get_page_inlinks(p,w)
         r_inlinks_translations = get_pages_lang(r_inlinks, w, wiki_db)
         for r_t in r_inlinks_translations:
+            # remove if the translated inlink already exists
+            if r_t["page_title"].replace(" ","_") in page_title_inlinks:
+                continue
             dict_out = {
                 "source":r_t["page_title"],
                 "target": page_title,
