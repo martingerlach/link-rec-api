@@ -19,6 +19,8 @@ def get_page_langs(page_title, wiki_db):
         'titles': page_title,
         'prop': 'langlinks',
         'format': 'json',
+        'lllimit': 500,
+
     }
 
     list_page_title_lang = []
@@ -72,30 +74,31 @@ def get_pages_lang(list_pages, wiki_db, wiki_db_translate, n_batch = 50):
     api_url_base = 'https://%s.wikipedia.org/w/api.php'%( wiki_db.replace('wiki','') )
 
     list_pages_translate = []
-    ## splitting into batches (n_batch=50)
-    list_pages_split = np.array_split(list_pages,math.ceil(len(list_pages)/n_batch))
-    for list_pages_batch in list_pages_split:
-        params = {
-            'action': 'query',
-            'titles': "|".join(list_pages_batch),
-            'prop': 'langlinks',
-            'lllang': '%s'%( wiki_db_translate.replace('wiki','') ),
-            'lllimit': 500,
-            'format': 'json',
-        }
-        # try:
-        response = requests.get( api_url_base,params=params, headers=headers).json()
-        results = [h for h in list(response["query"]["pages"].values()) if "langlinks" in h]
-
-        for s in results:
-            s_out = {
-                "page_title":s["langlinks"][0]["*"],
-                "page_title_original":s["title"],
-                "wiki_db_original":wiki_db
+    if len(list_pages) > 0:
+        ## splitting into batches (n_batch=50)
+        list_pages_split = np.array_split(list_pages,math.ceil(len(list_pages)/n_batch))
+        for list_pages_batch in list_pages_split:
+            params = {
+                'action': 'query',
+                'titles': "|".join(list_pages_batch),
+                'prop': 'langlinks',
+                'lllang': '%s'%( wiki_db_translate.replace('wiki','') ),
+                'lllimit': 500,
+                'format': 'json',
             }
-            list_pages_translate += [s_out]
-        # except:
-        #     pass
+            try:
+                response = requests.get( api_url_base,params=params, headers=headers).json()
+                results = [h for h in list(response["query"]["pages"].values()) if "langlinks" in h]
+
+                for s in results:
+                    s_out = {
+                        "page_title":s["langlinks"][0]["*"],
+                        "page_title_original":s["title"],
+                        "wiki_db_original":wiki_db
+                    }
+                    list_pages_translate += [s_out]
+            except:
+                pass
     return list_pages_translate
 
 def link_translate_inlink(page_title, wiki_db, langs_translate=None):
@@ -103,6 +106,7 @@ def link_translate_inlink(page_title, wiki_db, langs_translate=None):
 
     # find the same article in other languages
     page_title_langs = get_page_langs(page_title, wiki_db)
+    print(len(page_title_langs))
     # find existing inlinks
     page_title_inlinks = get_page_inlinks(page_title, wiki_db)
     # find inlinks in each language and check if they exist in wiki_db

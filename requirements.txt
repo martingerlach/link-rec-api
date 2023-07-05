@@ -1,6 +1,8 @@
+requests
 flask
 pandas
-Flask-Caching
-flask-cors
+flask
+Flask-Cors
 argparse
-requests
+PyYAML
+
