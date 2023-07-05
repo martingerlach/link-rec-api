@@ -34,8 +34,8 @@ print("Try: http://127.0.0.1:5000/api/v1/in?lang=en&title=Degersee&ltrans=de|fr"
 
 @app.route('/')
 def index():
-    # return render_template('index.html')
-    return 'Server Works!'
+    return render_template('index.html')
+    # return 'Server Works!'
 
 @app.route('/api/v1/in', methods=['GET'])
 def get_recommendations():
