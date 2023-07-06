@@ -43,6 +43,7 @@ def get_page_inlinks(page_title, wiki_db):
 
     TODO: use continue to also get results beyond 500
     """
+    headers = {"User-Agent": "MGerlach_(WMF) WMF-Research"}
     api_url_base = 'https://%s.wikipedia.org/w/api.php'%( wiki_db.replace('wiki','') )
 
     params = {
