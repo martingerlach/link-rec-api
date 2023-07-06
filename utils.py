@@ -43,7 +43,6 @@ def get_page_inlinks(page_title, wiki_db):
 
     TODO: use continue to also get results beyond 500
     """
-    headers = {"User-Agent": "MGerlach_(WMF) WMF-Research"}
     api_url_base = 'https://%s.wikipedia.org/w/api.php'%( wiki_db.replace('wiki','') )
 
     params = {
@@ -57,13 +56,18 @@ def get_page_inlinks(page_title, wiki_db):
         'format': 'json',
     }
     page_title_inlinks = []
-    try:
+    last_continue = {}
+    while True:
+        params.update(last_continue)
         response = requests.get( api_url_base,params=params, headers=headers).json()
-        results = list(response["query"]["pages"].values())[0]["linkshere"]
+        results = list(response["query"]["pages"].values())[0].get("linkshere",[])
         for s in results:
             page_title_inlinks += [s["title"].replace(" ","_")]
-    except:
-        pass
+        # if there is no continue then we got all results so we can stop
+        if 'continue' not in response:
+            break
+        # get the new continue parameter
+        last_continue = response["continue"]
     return page_title_inlinks
 
 def get_pages_lang(list_pages, wiki_db, wiki_db_translate, n_batch = 50):
