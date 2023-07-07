@@ -55,7 +55,7 @@ def get_recommendations():
 
 
         df_formatted["links"] = df_formatted.apply(lambda x: [ {
-            "wiki_db_translate":x["wiki_db_translate"][i],
+            "lang_translate":x["lang_translate"][i],
             "link_translate":(x["source_translate"][i],x["target_translate"][i])
         } for i in range(len(x["target"]))] ,axis=1)
         df_formatted = df_formatted[["source","links","n"]].reset_index(drop=True)
@@ -76,16 +76,6 @@ def get_recommendations():
         return jsonify(out_json)
     else:
         return jsonify({'Error':"No results"})
-
-
-
-    recs_formatted = {
-        "wiki_db":wiki_db,
-        "item_id":item_id,
-        "title":title,
-        "recs":recs_links_formatted
-    }
-    return recs_formatted
 
 if __name__ == '__main__':
     '''
