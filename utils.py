@@ -134,7 +134,7 @@ def link_translate_inlink(page_title, wiki_db, langs_translate=None):
                 "target": page_title,
                 "source_translate": r_t["page_title_original"],
                 "target_translate": p,
-                "wiki_db_translate": w,
+                "lang_translate": w.replace("wiki",""),
             }
             list_links += [dict_out]
         # break
