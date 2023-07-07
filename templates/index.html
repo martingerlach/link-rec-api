@@ -34,7 +34,7 @@
 		<div id="tool_header--holder" class="boxwidth--1-1 padded--left padded--right">
 			<header id="tool_header">
 				<!-- Tool name -->
-				<h1>Link recommendation</h1>
+				<h1>Link recommendation to increase the visibility of articles</h1>
 				<div class="meta">
 					<div class="disclaimer note">
 						No guarantees are made that this tool will be maintained.
@@ -43,10 +43,10 @@
 							<a href="https://wikitech.wikimedia.org/wiki/Wikitech:Cloud_Services_Terms_of_use" target="_blank" rel="noopener">Terms of Use</a>.
 					</div>
 					<div class="description padded--right">
-						<p>	This tool suggests new incoming links based on existing links in other wikis</p>
-						<p> You can learn more about the model <a href="https://meta.wikimedia.org/wiki/Research:Recommending_links_to_increase_visibility_of_articles/Link-translation">here</a>.
+						<p>	There are millions of <a href="https://en.wikipedia.org/wiki/Wikipedia:Orphan">orphan articles</a> in Wikipedia. These are articles without any incoming links. Thus, orphan articles are not easily accessible by readers when navigating Wikipedia. For more details, see the paper <a href="https://arxiv.org/abs/2306.03940">Orphan Articles: The Dark Matter of Wikipedia</a> </p>
+						<p>	This tool aims to increase the visibility of these articles. It generates recommendations of articles from where to link to the given target articles (such as an orphan article). We identify recommendations by looking up the corresponding article in other Wikipedia languages. Surprisingly, in many cases there are already existing links which we can readily "translate". The advantage is that these recommendations can be considered high quality and are easily interpretable because they have already been vetted by other language communities. You can learn more about the model <a href="https://meta.wikimedia.org/wiki/Research:Recommending_links_to_increase_visibility_of_articles/Link-translation">here</a>.
 						</p>
-				  		<p> You can test out the tool below with your own article -- e.g., Toni Morrison (en) -- or leave the title field blank for a random article. </p>
+				  		<p> You can test out the tool below with your own article -- for example from the <a href="https://en.wikipedia.org/wiki/Category:All_orphaned_articles">list of orphan articles in English Wikipedia</a> (there are similar lists in other languages). The result is a list of potential source articles from where to link to the orphan article. The suggested link already exists in at least one other Wikipedia.</p>
 
 						<!-- </p> -->
 						<!-- <p>	  </p> -->
@@ -75,11 +75,11 @@
 									</div>
 									<div class="col col1">
 										{% if title %}
-										<label class="placeholder"><span class="field_name">Article title -- e.g., Toni Morrison</span>
+										<label class="placeholder"><span class="field_name">Article title -- e.g., Alcohol Act (Switzerland)</span>
 											<input type="text" value="{{title}}" placeholder="Placeholder text" id="page_title"/>
 										</label>
 										{% else %}
-										<label class="placeholder"><span class="field_name">Article title -- e.g., Toni Morrison</span>
+										<label class="placeholder"><span class="field_name">Article title -- e.g., Alcohol Act (Switzerland)</span>
 											<input type="text" value="" placeholder="Placeholder text" id="page_title"/>
 										</label>
 										{% endif %}
@@ -155,16 +155,21 @@
 				$("#inlinks-results").append("<br><p>Error: " + data["Error"] + "</p>");
 			}
 			else {
-				$("#inlinks-results").append('<br><h3><a href="' + data["article"] + '">' + data["lang"]+':'+data["page_title"] + '</a></h3>');
-				$("#inlinks-results").append('<br>Potential articles to link to this article are:');
-				if (data["results"].length > 0) {
-					$("#inlinks-results").append("<ol>");
-					for (var cat in data["results"]) {
-						$("#inlinks-results").append('<li><a href="https://'+data["lang"]+'.wikipedia.org/wiki/'+data["results"][cat]["source"]+'">' + data["lang"]+':'+data["results"][cat]["source"] + '</a> ('+data["results"][cat]["n_links"]+' other wikis)');
-							$("#inlinks-results").append( "</li>");
+				$("#inlinks-results").append('<br><h3>'+ data["lang"]+': ??? --> <a href="' + data["article"] + '">' +data["page_title"] + '</a></h3>');
+				$("#inlinks-results").append('Based on existing links in other language versions, below you will find a list of articles where you could add a link to this article. ');
+				$("#inlinks-results").append('<p> </p>');
 
-					}
-					$("#inlinks-results").append("</ol>");
+				if (data["results"].length > 0) {
+					for (var rec in data["results"]) {
+						$("#inlinks-results").append('<h4><a href="https://'+data["lang"]+'.wikipedia.org/wiki/'+data["results"][rec]["source"]+'">'+data["results"][rec]["source"] + '</a> </h4>');
+						$("#inlinks-results").append('Existing links in '+data["results"][rec]["n_links"]+' other wikis:');
+
+						for (var link in data["results"][rec]["links"]) {
+							$("#inlinks-results").append('<li>'+data["results"][rec]["links"][link]["lang_translate"]+': <a href="https://'+data["results"][rec]["links"][link]["lang_translate"]+'.wikipedia.org/wiki/'+data["results"][rec]["links"][link]["link_translate"][0]+'">' + data["results"][rec]["links"][link]["link_translate"][0] + '</a> --> <a href="https://'+data["results"][rec]["links"][link]["lang_translate"]+'.wikipedia.org/wiki/'+data["results"][rec]["links"][link]["link_translate"][1]+'">' + data["results"][rec]["links"][link]["link_translate"][1] + '</a> </li>');
+						}
+
+
+			  		}
 			  	}
 			  	else {
 					$("#inlinks-results").append("<li>No links found.</li>");
