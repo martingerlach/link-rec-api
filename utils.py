@@ -111,7 +111,6 @@ def link_translate_inlink(page_title, wiki_db, langs_translate=None):
 
     # find the same article in other languages
     page_title_langs = get_page_langs(page_title, wiki_db)
-    print(len(page_title_langs))
     # find existing inlinks
     page_title_inlinks = get_page_inlinks(page_title, wiki_db)
     # find inlinks in each language and check if they exist in wiki_db
@@ -138,4 +137,8 @@ def link_translate_inlink(page_title, wiki_db, langs_translate=None):
             }
             list_links += [dict_out]
         # break
-    return list_links
+    dict_out = {
+        "inlinks_exist": page_title_inlinks,
+        "inlinks_recs": list_links
+    }
+    return dict_out
