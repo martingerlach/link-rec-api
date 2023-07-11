@@ -34,7 +34,7 @@
 		<div id="tool_header--holder" class="boxwidth--1-1 padded--left padded--right">
 			<header id="tool_header">
 				<!-- Tool name -->
-				<h1>Link recommendation to increase the visibility of articles</h1>
+				<h1>Increasing the visibility of orphan articles</h1>
 				<div class="meta">
 					<div class="disclaimer note">
 						No guarantees are made that this tool will be maintained.
@@ -156,7 +156,7 @@
 			}
 			else {
 				$("#inlinks-results").append('<br><h3>'+ data["lang"]+': ??? --> <a href="' + data["article"] + '">' +data["page_title"] + '</a></h3>');
-				$("#inlinks-results").append('Based on existing links in other language versions, below you will find a list of articles where you could add a link to this article. ');
+				$("#inlinks-results").append('This article is currently linked from <a href="https://'+data["lang"]+'.wikipedia.org/wiki/Special:WhatLinksHere/'+data["page_title"]+'">'+data["n_inlinks"] + ' articles</a>. If you want to increase this number and increase the visibility of this article, here are some suggestions where you could potentially add a link to this article. All suggestions are based on already existing links in other language versions of Wikipedia -- you can check out those articles to see where the corresponding link appears.');
 				$("#inlinks-results").append('<p> </p>');
 
 				if (data["results"].length > 0) {
