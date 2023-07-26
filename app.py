@@ -3,6 +3,7 @@ import re
 import requests
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from mwconstants import WIKIPEDIA_LANGUAGES
 import yaml
 import pickle
 import utils
@@ -34,15 +35,16 @@ print("Try: http://127.0.0.1:5000/api/v1/in?lang=en&title=Degersee&ltrans=de|fr"
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html',
+                           page_title=set_title(), lang=set_lang())
     # return 'Server Works!'
 
 @app.route('/api/v1/in', methods=['GET'])
 def get_recommendations():
 
-    wiki_lang = request.args.get('lang')
+    wiki_lang = set_lang()
     wiki_db = wiki_lang+"wiki"
-    page_title = request.args.get('title')
+    page_title = set_title()
     langs_translate = request.args.get('ltrans')
     if langs_translate!=None and isinstance(langs_translate,str):
         langs_translate = langs_translate.split("|")
@@ -79,6 +81,29 @@ def get_recommendations():
         return jsonify(out_json)
     else:
         return jsonify({'Error':"No results"})
+
+def set_lang():
+    if 'lang' in request.args:
+        lang = request.args['lang'].lower()
+        if lang in WIKIPEDIA_LANGUAGES:
+            return lang
+    return None
+
+def set_title():
+    if 'page_title' in request.args:
+        title = request.args['page_title']
+    elif 'title' in request.args:
+        title = request.args['title']
+    else:
+        title = None
+
+    if title:
+        title = title.replace('_', ' ').strip()
+        try:
+            title = title[0].capitalize() + title[1:]
+        except IndexError:
+            title = None
+    return title
 
 if __name__ == '__main__':
     '''
