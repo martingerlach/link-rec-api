@@ -51,6 +51,7 @@ def get_recommendations():
     dict_result =  utils.link_translate_inlink(page_title, wiki_db, langs_translate=langs_translate)
     list_links = dict_result["inlinks_recs"]
     page_title_inlinks = dict_result["inlinks_exist"]
+    results = []
     df = pd.DataFrame(list_links)
     if len(df)>0:
         df_formatted = df.groupby(by="source", as_index=False).agg(list)
@@ -71,16 +72,16 @@ def get_recommendations():
                 "links": df_formatted["links"].iloc[i]
             }
             results+=[dict_out]
-        out_json = {
-            "page_title": page_title,
-            "lang": wiki_lang,
-            "article": "https://{0}.wikipedia.org/wiki/{1}".format(wiki_lang,page_title),
-            "n_inlinks": len(page_title_inlinks),
-            "results": results
-        }
-        return jsonify(out_json)
-    else:
-        return jsonify({'Error':"No results"})
+    out_json = {
+        "page_title": page_title,
+        "lang": wiki_lang,
+        "article": "https://{0}.wikipedia.org/wiki/{1}".format(wiki_lang,page_title),
+        "n_inlinks": len(page_title_inlinks),
+        "results": results
+    }
+    return jsonify(out_json)
+    # else:
+    #     return jsonify({'Error':"No results"})
 
 def set_lang():
     if 'lang' in request.args:
