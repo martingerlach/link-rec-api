@@ -39,9 +39,8 @@ def get_page_inlinks(page_title, wiki_db):
     """
     Get all inlinks for a given page (main namespace, non-redirects).
 
-    Only returns first 500 results for now.
+    Retrieves all inlinks in batches of 500 using continue https://www.mediawiki.org/wiki/API:Continue
 
-    TODO: use continue to also get results beyond 500
     """
     headers = {"User-Agent": "MGerlach_(WMF) WMF-Research"}
     api_url_base = 'https://%s.wikipedia.org/w/api.php'%( wiki_db.replace('wiki','') )
