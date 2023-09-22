@@ -42,6 +42,12 @@ def index():
                            page_title=set_title(), lang=set_lang())
     # return 'Server Works!'
 
+@app.route('/readmore')
+def readmore():
+    return render_template('readmore.html',
+                           page_title=set_title(), lang=set_lang())
+    # return 'Server Works!'
+
 @app.route('/api/v1/in', methods=['GET'])
 def get_recommendations():
 
@@ -89,7 +95,7 @@ def get_recommendations():
 
 @app.route('/api/v1/out', methods=['GET'])
 def get_recommendations_out():
-    n_wikis_min = 2
+    n_wikis_min = 1
     wiki_lang = set_lang()
     wiki_db = wiki_lang+"wiki"
     page_title = set_title()
@@ -103,6 +109,7 @@ def get_recommendations_out():
     ## aggregating across langs
     results = []
     df = pd.DataFrame(list_links)
+    df_formatted=pd.DataFrame()
     if len(df)>0:
         df_formatted = df.groupby(by="target", as_index=False).agg(list)
         df_formatted["n"] = df_formatted.apply(lambda x: len(x["target_translate"]),axis=1)
@@ -116,7 +123,7 @@ def get_recommendations_out():
 
         # keep only links that exist in at n_wiki_min other wikis in order to reduce the potential list
         df_formatted = df_formatted[df_formatted["n"]>=n_wikis_min]
-
+    if len(df_formatted)>0:
         # get the kin of all recs
         df_formatted["kin"] = df_formatted.apply(lambda x: len(utils.get_page_inlinks(x["target"], wiki_db, do_continue=False)),axis=1)
 

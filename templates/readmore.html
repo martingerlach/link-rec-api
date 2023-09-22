@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Wiki-Visibility</title>
+	<link rel="shortcut icon" href="./static/favicon.ico">
+	<meta name="viewport" content="width = device-width, initial-scale=1, user-scalable = no" />
+	<link href="https://tools-static.wmflabs.org/fontcdn/css?family=Merriweather:400,400italic,700,700italic&subset=latin" rel="stylesheet" type="text/css">
+	<link href='https://tools-static.wmflabs.org/fontcdn/css?family=Lato:400,400italic,700,700italic&subset=latin' rel='stylesheet' type='text/css'>
+	<link href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="./static/style.css" />
+	<style>
+      .above-threshold {color: black;}
+      .below-threshold {color: silver;}
+      /*p { text-indent: 30px; }*/
+    </style>
+
+</head>
+
+<body>
+	<script type="text/javascript">
+		var body = document.body;
+		body.classList.add('js');
+	</script>
+
+	<div id="origin_bar">
+		<div class="boxwidth--1-1 padded--left padded--right">
+			<a href="https://research.wikimedia.org/" class="origin_title"><img src="./static/Wikimedia-Foundation-logo.svg" alt="Wikimedia Foundation logo" />Wikimedia Research</a>
+		</div>
+	</div>
+
+	<article id="tool_holder">
+		<!-- Header / Start -->
+		<div id="tool_header--holder" class="boxwidth--1-1 padded--left padded--right">
+			<header id="tool_header">
+				<!-- Tool name -->
+				<h1>Finding related invisible articles</h1>
+				<div class="meta">
+					<div class="disclaimer note">
+						No guarantees are made that this tool will be maintained.
+						This is an experimental tool hosted on <a href="https://wikitech.wikimedia.org/wiki/Portal:Toolforge">Toolforge</a>.
+						No additional personal data is collected by this tool per the Cloud Services
+							<a href="https://wikitech.wikimedia.org/wiki/Wikitech:Cloud_Services_Terms_of_use" target="_blank" rel="noopener">Terms of Use</a>.
+					</div>
+					<div class="description padded--right">
+						<p>	There are millions of <a href="https://en.wikipedia.org/wiki/Wikipedia:Orphan">orphan articles</a> in Wikipedia. These are articles without any incoming links. Thus, orphan articles are de-facto invisible for readers when navigating Wikipedia. For more details, see the paper <a href="https://arxiv.org/abs/2306.03940">Orphan Articles: The Dark Matter of Wikipedia</a> </p>
+						<p>	This tool aims to surface articles lacking visibility as follow-up reading recommendations for a selected article in given language. In spirit, it is similar to the <a href="https://www.mediawiki.org/wiki/Reading/Web/Projects/Related_pages">Read more feature</a>. In contrast to readmore, our experimental tool selects related articles based on the following criteria: i) novelty: they do not yet appear as blue links in the selected articles and the given language; ii) lack of visibility: they appear as blue links in only few (or no) other articles in the given language; and iii) relevance: they already exist as blue links in the selected article in other Wikipedia languages.
+						</p>
+				  		<p> You can test out the tool below with your own article. The result is a list of related articles lacking visibility.</p>
+				  		<p> Note that the tool does not return any results in cases when there are no existing links in other language versions from the selected article. Also, for articles which exist in many languages, you might encounter a timeout due to the large number of necessary queries (this is in an experimental stage and not yet very optimized). In order to address this, we only look at existing links in 10 languages (en,fr,de,es,ja,ru,pt,zh,it,fa) based on those Wikipedias with the largest number of active users (<a href="https://meta.wikimedia.org/wiki/List_of_Wikipedias">List of Wikipedias</a>). We hope to be able to expand the number of languages soo.</p>
+
+						<!-- </p> -->
+						<!-- <p>	  </p> -->
+					</div>
+				</div>
+			</header>
+		</div>
+
+		<div class="separator"></div>
+
+		<section id="inlinks" class="boxwidth--1-1 padded--left padded--right">
+					<main id="tool_main">
+						<section class="form">
+							<form action="#results">
+								<div class="cols cols3">
+									<div class="col col1">
+										{% if lang %}
+										<label class="placeholder"><span class="field_name">Language code -- e.g., en for English</span>
+											<input type="text" value="{{lang}}" placeholder="Placeholder text" id="lang"/>
+										</label>
+										{% else %}
+										<label class="placeholder"><span class="field_name">Language code -- e.g., en for English</span>
+											<input type="text" value="" placeholder="Placeholder text" id="lang"/>
+										</label>
+										{% endif %}
+									</div>
+									<div class="col col1">
+										{% if page_title %}
+										<label class="placeholder"><span class="field_name">Article title -- e.g., Tiwanaku</span>
+											<input type="text" value="{{page_title}}" placeholder="Placeholder text" id="page_title"/>
+										</label>
+										{% else %}
+										<label class="placeholder"><span class="field_name">Article title -- e.g., Tiwanaku</span>
+											<input type="text" value="" placeholder="Placeholder text" id="page_title"/>
+										</label>
+										{% endif %}
+									</div>
+									<div class="col col1">
+										<span class="field_name"></span>
+										<input type="submit" value="Submit" id="btnSubmit" />
+									</div>
+								</div>
+							</form>
+						</section>
+						<section id="results">
+							<div class="cols cols3">
+								<div class="col col3">
+									<section class="text" id="inlinks-results">
+										<!-- Empty section to hold results -->
+									</section>
+								</div>
+							</div>
+		            	</section>
+					</main>
+				</section>
+			</article>
+
+	<footer id="tool_footer">
+		<div id="tool_footer-in" class="boxwidth--1-1 padded--left padded--right">
+			<p>Experimental tool developed by <span class="tool-author"><a href="https://meta.wikipedia.org/wiki/User:MGerlach_(WMF)">MGerlach (WMF)</a> as part of <a href="https://research.wikimedia.org/">Wikimedia Research</a></span>.</p>
+			<ul>
+				<li><a href="https://github.com/martingerlach/link-rec-api">View Source</a></li>
+				<li><a href="https://meta.wikimedia.org/wiki/Research:Recommending_links_to_increase_visibility_of_articles">Meta</a></li>
+				<li><a href="https://github.com/martingerlach/link-rec-api/blob/main/LICENSE">License</a></li>
+			</ul>
+		</div>
+	</footer>
+
+
+
+		<script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    	<script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('form label.placeholder').each(function() {
+					if (!$('input, textarea, select', this).val()) {
+		 				$(this).addClass('off');
+					}
+					$(this).on('focusin', function() {
+						$(this).removeClass('off');
+					});
+					$(this).on('focusout', function() {
+						if (!$('input, textarea, select', this).val()) {
+							$(this).addClass('off');
+						}
+					});
+					$('*[placeholder]', this).attr('placeholder', '');
+				});
+			});
+		</script>
+
+	<script type="text/javascript">
+		$('#btnSubmit').click(function (e) {
+		   e.preventDefault(); queryInlinksAPI();
+		});
+		window.onload = function() {
+			if (document.getElementById('lang').value && document.getElementById('page_title').value) {
+				queryInlinksAPI();
+			}
+		}
+		$( function() {
+			$( "#page_title" ).autocomplete({
+				source: function( request, response ) {
+					$.ajax( {
+						url: "https://" + document.getElementById('lang').value + ".wikipedia.org/w/api.php",
+						data: {
+							action: "opensearch",
+							search: request.term,
+							limit: 5,
+							namespace: 0,
+							format: "json",
+							origin: "*"
+						},
+						success: function(data) {
+							response($.map( data[1], function( item ) {
+								return {
+									label: item,
+									value: item
+								}
+							}));
+						}
+					} );
+				},
+				minLength: 2,
+				delay: 300  // milliseconds
+			} );
+		});
+
+
+
+		var render_results = function(data) {
+			$("#inlinks-results").empty();
+			// $("#inlinks-results").append('<br><p> Found potential source articles to link to: <a href="'+data["articles"]+'">'+ data["page_title"] +'</a></p>');
+			if ("Error" in data) {
+				$("#inlinks-results").append("<br><p>Error: " + data["Error"] + "</p>");
+			}
+			else {
+				$("#inlinks-results").append('<br><h3>'+ data["lang"]+': <a href="' + data["article"] + '">' +data["page_title"] + '</a> --> ???</h3>');
+				$("#inlinks-results").append('This article contains links to '+data["n_outlinks"] + ' other Wikipedia articles.')
+				$("#inlinks-results").append('Below you find a list of other potentially related articles not linked in the current article.');
+				$("#inlinks-results").append('<p> </p>');
+
+				if (data["results"].length > 0) {
+					for (var rec in data["results"]) {
+						$("#inlinks-results").append('<h4><a href="https://'+data["lang"]+'.wikipedia.org/wiki/'+data["results"][rec]["target"]+'">'+data["results"][rec]["target"] + '</a> </h4>');
+						$("#inlinks-results").append('Visibility: This article is linked from only <a href="https://'+data["lang"]+'.wikipedia.org/wiki/Special:WhatLinksHere/'+data["results"][rec]["target"]+'">'+data["results"][rec]["kin"] + ' other articles</a> (500 indicates 500 or larger)');
+						$("#inlinks-results").append('<br> Relevance: This article is linked from the current page in '+data["results"][rec]["n_wikis"]+' other wikis:');
+
+						for (var link in data["results"][rec]["links"]) {
+							$("#inlinks-results").append('<li>'+data["results"][rec]["links"][link]["lang_translate"]+': <a href="https://'+data["results"][rec]["links"][link]["lang_translate"]+'.wikipedia.org/wiki/'+data["results"][rec]["links"][link]["link_translate"][0]+'">' + data["results"][rec]["links"][link]["link_translate"][0] + '</a> --> <a href="https://'+data["results"][rec]["links"][link]["lang_translate"]+'.wikipedia.org/wiki/'+data["results"][rec]["links"][link]["link_translate"][1]+'">' + data["results"][rec]["links"][link]["link_translate"][1] + '</a> </li>');
+						}
+
+
+			  		}
+			  	}
+			  	else {
+					$("#inlinks-results").append("<li>No links found. Try another article.</li>");
+			  	}
+			}
+		}
+
+		var update_title = function(data) {
+			document.getElementById('page_title').value = data['query']['random'][0]['title'];
+			document.getElementById('page_title').parentNode.className = 'placeholder';
+		}
+
+		function queryInlinksAPI() {
+			if (document.getElementById('lang').value && !document.getElementById('page_title').value) {
+				var randomPageQueryURL = "https://" + document.getElementById('lang').value + ".wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0&origin=*";
+				$.ajax(randomPageQueryURL, {success: update_title.bind(this),
+								error: function(jqxmlhr, status, error){console.log(status + ": " + error)},
+								async: false
+								}
+					);
+			}
+			var queryUrl = "https://linkrec.toolforge.org/api/v1/out?lang=" + document.getElementById('lang').value+"&title=" + document.getElementById('page_title').value
+			+"&ltrans=en|fr|de|es|ja|ru|pt|zh|it|fa";
+			$.ajax(queryUrl, {success: render_results.bind(this),
+							  error: function(jqxmlhr, status, error){console.log(status + ": " + error)}
+							  }
+				  );
+	    }
+
+	</script>
+
+</body>
+
+</html>
