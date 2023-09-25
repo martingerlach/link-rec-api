@@ -48,7 +48,7 @@
 						<p>	This tool aims to surface articles lacking visibility as follow-up reading recommendations for a selected article in given language. In spirit, it is similar to the <a href="https://www.mediawiki.org/wiki/Reading/Web/Projects/Related_pages">Read more feature</a>. In contrast to readmore, our experimental tool selects related articles based on the following criteria: i) novelty: they do not yet appear as blue links in the selected articles and the given language; ii) lack of visibility: they appear as blue links in only few (or no) other articles in the given language; and iii) relevance: they already exist as blue links in the selected article in other Wikipedia languages.
 						</p>
 				  		<p> You can test out the tool below with your own article. The result is a list of related articles lacking visibility.</p>
-				  		<p> Note that the tool does not return any results in cases when there are no existing links in other language versions from the selected article. Also, for articles which exist in many languages, you might encounter a timeout due to the large number of necessary queries (this is in an experimental stage and not yet very optimized). In order to address this, we only look at existing links in 10 languages (en,fr,de,es,ja,ru,pt,zh,it,fa) based on those Wikipedias with the largest number of active users (<a href="https://meta.wikimedia.org/wiki/List_of_Wikipedias">List of Wikipedias</a>). We hope to be able to expand the number of languages soo.</p>
+				  		<p> Caveats: The tool does not return any results in cases when there are no existing links in other language versions from the selected article. Also, for articles which exist in many languages, you might encounter a timeout due to the large number of necessary queries (this is in an experimental stage and not yet very optimized). We hope to improve that in the future.</p>
 
 						<!-- </p> -->
 						<!-- <p>	  </p> -->
@@ -224,8 +224,8 @@
 								}
 					);
 			}
-			var queryUrl = "https://linkrec.toolforge.org/api/v1/out?lang=" + document.getElementById('lang').value+"&title=" + document.getElementById('page_title').value
-			+"&ltrans=en|fr|de|es|ja|ru|pt|zh|it|fa";
+			var queryUrl = "https://linkrec.toolforge.org/api/v1/out?lang=" + document.getElementById('lang').value+"&title=" + document.getElementById('page_title').value;
+			// +"&ltrans=en|fr|de|es|ja|ru|pt|zh|it|fa";
 			$.ajax(queryUrl, {success: render_results.bind(this),
 							  error: function(jqxmlhr, status, error){console.log(status + ": " + error)}
 							  }

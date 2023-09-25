@@ -95,7 +95,7 @@ def get_recommendations():
 
 @app.route('/api/v1/out', methods=['GET'])
 def get_recommendations_out():
-    n_wikis_min = 1
+    n_wikis_min = 2
     wiki_lang = set_lang()
     wiki_db = wiki_lang+"wiki"
     page_title = set_title()
