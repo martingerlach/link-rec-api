@@ -95,7 +95,7 @@ def get_recommendations():
 
 @app.route('/api/v1/out', methods=['GET'])
 def get_recommendations_out():
-    n_wikis_min = 2
+    n_wikis_min = 1
     wiki_lang = set_lang()
     wiki_db = wiki_lang+"wiki"
     page_title = set_title()
@@ -129,7 +129,9 @@ def get_recommendations_out():
 
 
         # sort first by kin, second by n_wikis
-        df_formatted = df_formatted.sort_values(by=["kin","n"], ascending=[True,False])
+        df_formatted["x_sort"] = df_formatted["n"]/(1+df_formatted["kin"])
+        df_formatted = df_formatted.sort_values(by=["x_sort"], ascending=[False])
+        # df_formatted = df_formatted.sort_values(by=["kin","n"], ascending=[True,False])
 
 
 
