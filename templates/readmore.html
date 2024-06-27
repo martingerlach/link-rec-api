@@ -194,7 +194,7 @@
 				if (data["results"].length > 0) {
 					for (var rec in data["results"]) {
 						$("#inlinks-results").append('<h4><a href="https://'+data["lang"]+'.wikipedia.org/wiki/'+data["results"][rec]["target"]+'">'+data["results"][rec]["target"] + '</a> </h4>');
-						$("#inlinks-results").append('Visibility: This article is linked from only <a href="https://'+data["lang"]+'.wikipedia.org/wiki/Special:WhatLinksHere/'+data["results"][rec]["target"]+'">'+data["results"][rec]["kin"] + ' other articles</a> (500 indicates 500 or larger)');
+						$("#inlinks-results").append('Visibility: This article is linked from only <a href="https://'+data["lang"]+'.wikipedia.org/wiki/Special:WhatLinksHere/'+data["results"][rec]["target"]+'">'+data["results"][rec]["kin"] + ' other articles</a>');
 						$("#inlinks-results").append('<br> Relevance: This article is linked from the current page in '+data["results"][rec]["n_wikis"]+' other wikis:');
 
 						for (var link in data["results"][rec]["links"]) {
