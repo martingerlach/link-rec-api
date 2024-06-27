@@ -125,8 +125,10 @@ def get_recommendations_out():
         df_formatted = df_formatted[df_formatted["n"]>=n_wikis_min]
     if len(df_formatted)>0:
         # get the kin of all recs
-        df_formatted["kin"] = df_formatted.apply(lambda x: len(utils.get_page_inlinks(x["target"], wiki_db, do_continue=False)),axis=1)
-
+#         df_formatted["kin"] = df_formatted.apply(lambda x: len(utils.get_page_inlinks(x["target"], wiki_db, do_continue=False)),axis=1)
+        list_pages = list(df_formatted["target"].values)
+        df_kin = utils.get_pages_kin(list_pages, wiki_db)
+        df_formatted = df_formatted.join(df_kin.set_index("target"), how="left", on="target")
 
         # sort first by kin, second by n_wikis
         df_formatted["x_sort"] = df_formatted["n"]/(1+df_formatted["kin"])

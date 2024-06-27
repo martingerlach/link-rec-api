@@ -1,7 +1,7 @@
 import requests
 import math
 import numpy as np
-
+import replicas
 
 def get_page_langs(page_title, wiki_db):
     """
@@ -244,3 +244,31 @@ def link_translate_outlink(page_title, wiki_db, langs_translate=None):
         "outlinks_recs": list_links
     }
     return dict_out
+
+def get_pages_kin(list_pages, wiki_db):
+    q = """
+        SELECT lt_title AS target, COUNT(pl_from) AS kin
+        FROM pagelinks pl
+        INNER JOIN linktarget lt ON pl_target_id = lt_id
+        WHERE
+            lt_namespace = 0
+            AND lt_title IN {0}
+            AND pl_from_namespace = 0
+        GROUP BY lt_title
+    """.format(tuple([p.replace(" ","_") for p in list_pages]))
+    
+    conn = replicas.make_connection(wiki_db)
+    result = replicas.query(conn,q)
+    
+    df_kin = pd.DataFrame()
+    df_kin["target"] = list_pages
+    
+    if result != None:
+        df_result = pd.DataFrame(result)
+        df_result.columns = ["target","kin"]
+        df_result["target"] = df_result["target"].apply(lambda x: x.decode("utf-8").replace("_"," "))
+        df_kin = df_kin.join(df_result.set_index("target"), how="left", on="target",)
+        df_kin["kin"] = df_kin["kin"].fillna(value=0)
+    else:
+        df_kin["kin"] = 0
+    return df_kin
