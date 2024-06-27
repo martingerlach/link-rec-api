@@ -109,7 +109,9 @@ def get_page_outlinks(page_title, wiki_db):
         last_continue = response["continue"]
     # resolve redirects
     page_title_outlinks_resolved = resolve_redirects_titles(page_title_outlinks,wiki_db)
-    return page_title_outlinks_resolved
+    # additional filter for non-main namespace artcile
+    page_title_outlinks_filtered = [p for p in page_title_outlinks_resolved if ":" not in p]
+    return page_title_outlinks_filtered
 
 def resolve_redirects_titles(list_pages, wiki_db, n_batch = 50):
     headers = {"User-Agent": "MGerlach_(WMF) WMF-Research"}
