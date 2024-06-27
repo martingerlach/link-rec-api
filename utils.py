@@ -2,6 +2,7 @@ import requests
 import math
 import numpy as np
 import replicas
+import pandas as pd
 
 def get_page_langs(page_title, wiki_db):
     """
