@@ -12,9 +12,9 @@ def make_connection(wiki_db, replica_type="analytics"):
         charset='utf8'
     )
 
-def query(conn, query, args):
+def query(conn, query):
     """Execute a SQL query against the connection, and return **all** the results."""
     with conn.cursor() as cur:
-        cur.execute(query, args=args)
+        cur.execute(query)
         data = cur.fetchall()
         return data
