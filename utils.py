@@ -3,6 +3,7 @@ import math
 import numpy as np
 import replicas
 import pandas as pd
+import mwparserfromhell
 
 def get_page_langs(page_title, wiki_db):
     """
@@ -216,9 +217,9 @@ def link_translate_outlink(page_title, wiki_db, langs_translate=None):
 
     # find the same article in other languages
     page_title_langs = get_page_langs(page_title, wiki_db)
-    # find existing inlinks
+    # find existing outlinks
     page_title_outlinks = get_page_outlinks(page_title, wiki_db)
-    # find inlinks in each language and check if they exist in wiki_db
+    # find outlinks in each language and check if they exist in wiki_db
     for r in page_title_langs:
         p = r["page_title"]
         w = r["wiki_db"]
@@ -227,10 +228,11 @@ def link_translate_outlink(page_title, wiki_db, langs_translate=None):
             if isinstance(langs_translate,list):
                 if w.replace("wiki","") not in langs_translate:
                     continue
-        r_outlinks = get_page_outlinks(p,w)
+#         r_outlinks = get_page_outlinks(p,w)
+        r_outlinks = get_page_outlinks_wikitext(p,w)
         r_outlinks_translations = get_pages_lang(r_outlinks, w, wiki_db)
         for r_t in r_outlinks_translations:
-            # remove if the translated inlink already exists
+            # remove if the translated outlink already exists
             if r_t["page_title"].replace(" ","_") in page_title_outlinks:
                 continue
             dict_out = {
@@ -275,3 +277,55 @@ def get_pages_kin(list_pages, wiki_db):
     else:
         df_kin["kin"] = 0
     return df_kin
+
+def get_page_outlinks_wikitext(page_title, wiki_db):
+    """
+    Get all outlinks for a given page (main namespace).
+
+    Only returns first 500 results for now.
+
+    """
+    headers = {"User-Agent": "MGerlach_(WMF) WMF-Research"}
+    api_url_base = 'https://%s.wikipedia.org/w/api.php'%( wiki_db.replace('wiki','') )
+    # get wikitext
+    wikitext = get_page_wikitext(page_title,wiki_db)
+    # parse wikitext to get all links
+    wikicode = mwparserfromhell.parse(wikitext)
+    links = wikicode.filter_wikilinks()
+    links_filtered = []
+    for link in links:
+        try:
+            title = str(link.title)
+            if ":" in title:
+                continue
+            if "|" in title:
+                continue
+            links_filtered += [title.replace(" ","_")]
+        except:
+            pass
+
+    page_title_outlinks_resolved = resolve_redirects_titles(links_filtered,wiki_db)
+    return page_title_outlinks_resolved
+
+def get_page_wikitext(page_title, wiki_db):
+    """
+    Get the wikitext of the last revision of an article.
+    """
+    lang = wiki_db.replace("wiki","")
+    headers = {"User-Agent": "MGerlach_(WMF) WMF-Research"}
+    api_url_base = 'https://%s.wikipedia.org/w/api.php'%( wiki_db.replace('wiki','') )
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "rvprop": "content",
+#         "rvsection": "0",
+        "titles": page_title,
+        "format": "json",
+        "formatversion": "2",
+}
+    req = requests.get(api_url_base, headers=headers, params=params).json()
+    req_query = req.get("query")
+    req_pages = req_query.get("pages")
+    page = req_pages[0]
+    wikitext = page.get("revisions",[])[0].get("content","")
+    return wikitext

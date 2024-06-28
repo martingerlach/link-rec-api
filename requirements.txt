@@ -6,3 +6,5 @@ Flask-Cors
 argparse
 PyYAML
 mwconstants
+PyMySQL
+mwparserfromhell
