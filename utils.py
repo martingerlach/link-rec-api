@@ -174,7 +174,7 @@ def get_pages_lang(list_pages, wiki_db, wiki_db_translate, n_batch = 50):
                     title = s["langlinks"][0]["*"]
                     title = title.split("#")[0] # only keep page title without section refs
                     s_out = {
-                        "page_title": s["langlinks"][0]["*"],
+                        "page_title": title,
                         "page_title_original":s["title"],
                         "wiki_db_original":wiki_db
                     }
