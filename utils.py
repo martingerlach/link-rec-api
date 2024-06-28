@@ -134,6 +134,12 @@ def resolve_redirects_titles(list_pages, wiki_db, n_batch = 50):
                 response = requests.get( api_url_base,params=params, headers=headers).json()
                 results = response["query"]["pages"]
                 for page in results:
+                    # only keep links to main namespace
+                    if page["ns"] != 0:
+                        continue
+                    # redlinks
+                    if page.get("missing",False) == True:
+                        continue
                     title = page["title"].replace(" ","_")
                     list_pages_resolved += [title]
             except:
@@ -165,8 +171,10 @@ def get_pages_lang(list_pages, wiki_db, wiki_db_translate, n_batch = 50):
                 results = [h for h in list(response["query"]["pages"].values()) if "langlinks" in h]
 
                 for s in results:
+                    title = s["langlinks"][0]["*"]
+                    title = title.split("#")[0] # only keep page title without section refs
                     s_out = {
-                        "page_title":s["langlinks"][0]["*"],
+                        "page_title": s["langlinks"][0]["*"],
                         "page_title_original":s["title"],
                         "wiki_db_original":wiki_db
                     }
@@ -296,6 +304,7 @@ def get_page_outlinks_wikitext(page_title, wiki_db):
     for link in links:
         try:
             title = str(link.title)
+            title = title.split("#")[0]
             if ":" in title:
                 continue
             if "|" in title:
